@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Optimización I - Liga Pokémon</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/moon.min.css" id="theme">
+    
+    <!-- Fuentes para temática retro/videojuego -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* === ESTILOS GLOBALES & TIPOGRAFÍA === */
+        :root {
+            --poke-yellow: #FFCB05;
+            --poke-blue: #3C5AA6;
+            --poke-red: #CC0000;
+            --text-dark: #2c3e50;
+            --box-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            text-transform: none;
+            font-family: 'Fredoka', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+        }
+        
+        .reveal p, .reveal li {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 500;
+        }
+
+        .poke-title { 
+            color: var(--poke-yellow) !important; 
+            text-shadow: 3px 3px 0 var(--poke-blue), -2px -2px 0 var(--poke-blue), 2px -2px 0 var(--poke-blue), -2px 2px 0 var(--poke-blue), 2px 2px 0 var(--poke-blue), 5px 5px 15px rgba(0,0,0,0.8) !important; 
+            font-family: 'Press Start 2P', cursive !important;
+            line-height: 1.4 !important;
+        }
+        
+        .poke-subtitle { color: white !important; font-family: 'Press Start 2P', cursive !important; font-size: 0.6em !important; text-shadow: 2px 2px 4px black; }
+
+        /* === CAJAS DE TEXTO ESTILO POKÉDEX / DIÁLOGO === */
+        .dialog-box {
+            background-color: var(--box-bg);
+            color: var(--text-dark);
+            padding: 20px;
+            border-radius: 10px;
+            border: 5px solid var(--poke-blue);
+            margin: 10px auto;
+            font-size: 0.7em;
+            text-align: left;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.7);
+            max-width: 90%;
+            position: relative;
+        }
+        
+        .dialog-box::before {
+            content: "▼";
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            color: var(--poke-blue);
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+
+        .stats-box {
+            background-color: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 0.65em;
+            text-align: left;
+            border: 3px solid var(--poke-yellow);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+        }
+
+        /* === CONTENEDORES Y RESPONSIVIDAD === */
+        .flex-container { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 15px;
+        }
+        .flex-col { flex: 1 1 300px; }
+        
+        .small-text { font-size: 0.6em; line-height: 1.3; }
+        .med-text { font-size: 0.8em; line-height: 1.3; }
+        
+        ul.custom-list { padding-left: 20px; }
+        ul.custom-list li { margin-bottom: 12px; border-left: 3px solid var(--poke-red); padding-left: 10px; list-style-type: none; }
+
+        .qr-placeholder {
+            width: 100%;
+            max-width: 250px;
+            aspect-ratio: 1/1;
+            background-color: rgba(255,255,255,0.9);
+            border: 4px dashed var(--poke-red);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 0.5em;
+            font-weight: bold;
+            border-radius: 15px;
+            object-fit: contain;
+            margin: 10px auto;
+        }
+
+        /* === FONDOS DE PANTALLA & OVERLAYS === */
+        .reveal .slides section[data-background-image] {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        /* Capa oscura superpuesta obligatoria para que el texto resalte sobre CUALQUIER fondo de Pokémon */
+        .overlay {
+            background: rgba(0, 0, 0, 0.65); /* Fondo oscuro semitransparente */
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(3px); /* Efecto cristal ligero */
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        /* Ajustes específicos para móviles */
+        @media screen and (max-width: 768px) {
+            .poke-title { font-size: 1.2em !important; }
+            .dialog-box { font-size: 0.55em; padding: 10px; }
+            .stats-box { font-size: 0.55em; }
+            .flex-col { flex: 1 1 100%; }
+            .qr-placeholder { max-width: 150px; }
+            .overlay { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Diapositiva 1: Portada -->
+            <section data-background-image="fondos/bg_estadio.jpg" data-background-color="#222">
+                <div class="overlay">
+                    <h1 class="poke-title" style="font-size: 1.8em;">Optimización I</h1>
+                    <h3 class="poke-subtitle">Mtra. Guadalupe del Carmen Rodriguez Moreno</h3>
+                    
+                    <div class="flex-container">
+                        <div class="flex-col dialog-box">
+                            <p style="color: var(--poke-red); font-weight: bold; text-align: center;">¡UN NUEVO RETADOR APARECE!</p>
+                            <p>"En este curso trabajaremos con las matemáticas aplicadas, será un gusto apoyarlos a concretar sus conocimientos y usaremos conceptos de Gamificación"</p>
+                        </div>
+                        <div class="flex-col" style="text-align: center;">
+                            <img src="tu_qr_portada.png" alt="Escanea para comenzar" class="qr-placeholder">
+                            <p class="small-text" style="color: white; text-shadow: 1px 1px 2px black;">(Inserta tu_qr_portada.png)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diapositiva 2: Ruta y Habilidades -->
+            <section data-background-image="fondos/bg_ruta_bosque.jpg" data-background-color="#222">
+                <div class="overlay">
+                    <h2 class="poke-title" style="font-size: 1.5em;">Ruta del Entrenador</h2>
+                    <div class="dialog-box">
+                        <p>El alumno analizará problemas como modelos de programación lineal de una o varias funciones objetivo, eligiendo la versión adecuada del método simplex para sus soluciones y utilizando la teoría de la dualidad y el análisis de sensibilidad...</p>
+                    </div>
+                    
+                    <h3 style="color: var(--poke-yellow); margin-top: 20px; font-family: 'Press Start 2P'; font-size: 0.8em; text-shadow: 2px 2px black;">Habilidades Especiales (MOs)</h3>
+                    <div class="stats-box flex-container" style="justify-content: space-around;">
+                        <div>⚔️ Plantear Modelos</div>
+                        <div>🛡️ Resolver Modelos</div>
+                        <div>🧠 Interpretar Soluciones</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diapositiva 3: Historia IO -->
+            <section data-background-image="fondos/bg_laboratorio_oak.jpg" data-background-color="#222">
+    <div class="overlay">
+        <h2 class="poke-title" style="font-size: 1.3em;">
+            Archivos del Prof. Oak
+        </h2>
+
+        <div class="dialog-box" style="text-align: center;">
+            <p style="font-weight: bold; color: var(--poke-blue);">
+                Historia de la Investigación de Operaciones y la Ingeniería Industrial
+            </p>
+
+            <iframe 
+                width="560" 
+                height="315" 
+                src="https://www.youtube.com/embed/Ii-wJ_xmHNc?si=aBSBHOOcFLauCBfc"
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+            </iframe>
+
+        </div>
+    </div>
+</section>
+
+            <!-- Diapositiva 4: Mapa de la Región (Gimnasios) -->
+            <section data-background-image="fondos/bg_mapa_region.jpg" data-background-color="#222">
+                <div class="overlay">
+                    <h2 class="poke-title" style="font-size: 1.2em;">Mapa de la Región (Gimnasios)</h2>
+                    <div class="dialog-box text-center">
+                        <ul style="list-style: none; padding: 0; font-size: 1.2em; line-height: 2;">
+                            <li>🔘 <strong>1.</strong> Teoría de Sistemas</li>
+                            <li>🟠 <strong>2.</strong> Modelos de Programación Lineal</li>
+                            <li>🟡 <strong>3.</strong> Método Simplex</li>
+                            <li>🔵 <strong>4.</strong> Teoría de Dualidad</li>
+                            <li>💗 <strong>5.</strong> Programación de Metas</li>
+                        </ul>
+                    </div>
+                    <p class="small-text" style="color: white; margin-top: 10px;">¡Desliza hacia abajo para entrar a los gimnasios!</p>
+                </div>
+            </section>
+
+            <!-- SECCIÓN VERTICAL: GIMNASIOS DETALLADOS -->
+            <section>
+                <!-- Gimnasio 1: Plateada -->
+                <section data-background-image="fondos/bg_gimnasio_roca.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.2em;">Gimnasio Plateada 🔘</h2>
+                        <div class="stats-box"><strong>Líder de Gimnasio:</strong> Introducción a la Teoría de Sistemas</div>
+                        <div class="dialog-box">
+                            <p class="small-text" style="color:var(--poke-blue);"><strong>MISIÓN:</strong> Revisar el enfoque de sistemas y su aplicación para distinguir a la investigación de operaciones.</p>
+                            <ul class="small-text custom-list">
+                                <li>1.1 Rev. Industrial vs 1.2 Rev. Postindustrial.</li>
+                                <li>1.3 Concepto de sistema y propiedades.</li>
+                                <li>1.4 Objetivos, medio ambiente, recursos.</li>
+                                <li>1.5 Enfoque de sistemas (Conceptos básicos).</li>
+                                <li>1.6 Diseño y Mejora de un sistema.</li>
+                                <li>1.7 Origen y proceso de solución en la IO.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Gimnasio 2: Naranja -->
+                <section data-background-image="fondos/bg_gimnasio_fuego.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.2em;">Gimnasio Naranja 🟠</h2>
+                        <div class="stats-box"><strong>Líder de Gimnasio:</strong> Modelos de Programación Lineal</div>
+                        <div class="dialog-box">
+                            <p class="small-text" style="color:var(--poke-red);"><strong>MISIÓN:</strong> Diferenciar planteamientos y resolver modelos de 2 variables gráficamente.</p>
+                            <ul class="small-text custom-list">
+                                <li>2.1 Concepto, clasificación y estructura del modelo.</li>
+                                <li>2.2 Características y formulación matricial.</li>
+                                <li>2.3 Planeación de producción, dietas y mezclas.</li>
+                                <li>2.4 Conjunto convexo, región factible, optimalidad.</li>
+                                <li>2.5 Solución gráfica (2 variables).</li>
+                                <li>2.6 Tipos de Solución (básica, factible, óptima...).</li>
+                                <li>2.7 Uso de CAS, R, Excel.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Gimnasio 3: Amarillo -->
+                <section data-background-image="fondos/bg_gimnasio_electrico.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.2em;">Gimnasio Amarillo 🟡</h2>
+                        <div class="stats-box"><strong>Líder de Gimnasio:</strong> Método Simplex</div>
+                        <div class="dialog-box" style="font-size: 0.5em;">
+                            <div class="flex-container">
+                                <ul class="flex-col custom-list">
+                                    <li>3.1 Variables de holgura y exceso.</li>
+                                    <li>3.2 Reducción a forma estándar.</li>
+                                    <li>3.3 Matriz base.</li>
+                                    <li>3.4 Método Simplex (Solución inicial, mejoramiento, degeneración).</li>
+                                </ul>
+                                <ul class="flex-col custom-list">
+                                    <li>3.5 Método de Charnes (M grande).</li>
+                                    <li>3.6 Método de las dos fases.</li>
+                                    <li>3.7 Simplex revisado (matrices).</li>
+                                    <li>3.8 Software: Tora, LINDO, QSB.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Gimnasio 4: Azul -->
+                <section data-background-image="fondos/bg_gimnasio_agua.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.2em;">Gimnasio Azul 🔵</h2>
+                        <div class="stats-box"><strong>Líder de Gimnasio:</strong> Teoría de la Dualidad</div>
+                        <div class="dialog-box">
+                            <ul class="small-text custom-list">
+                                <li>4.1 Definición y Formulación del dual.</li>
+                                <li>4.2 Teorema fundamental de dualidad.</li>
+                                <li>4.3 Teorema de Holguras Complementarias.</li>
+                                <li>4.4 Interpretación económica.</li>
+                                <li>4.5 Algoritmo dual - simplex.</li>
+                                <li>4.6 Análisis de sensibilidad (Cambios en recursos, costos, coeficientes, nuevas variables).</li>
+                                <li>4.7 Software para análisis.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Gimnasio 5: Rosa -->
+                <section data-background-image="fondos/bg_gimnasio_psiquico.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.2em;">Gimnasio Rosa 💗</h2>
+                        <div class="stats-box"><strong>Líder de Gimnasio:</strong> Programación de Metas</div>
+                        <div class="dialog-box">
+                            <ul class="small-text custom-list">
+                                <li>5.1 Características de problemas lineales.</li>
+                                <li>5.2 Conceptos básicos.</li>
+                                <li>5.3 Formulación de modelos.</li>
+                                <li>5.4 Modelos de una sola meta.</li>
+                                <li>5.5 Modelos de metas múltiples.</li>
+                                <li>5.6 Métodos de solución (Gráfica, ponderación, preferencias).</li>
+                                <li>5.7 Uso de Tora, LINDO, QSB.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Pokédex de Sabiduría -->
+            <section data-background-image="fondos/bg_biblioteca.jpg" data-background-color="#222">
+                <div class="overlay">
+                    <h2 class="poke-title" style="font-size: 1.2em;">Pokédex de Sabiduría</h2>
+                    <div class="dialog-box flex-container">
+                        <ul class="flex-col custom-list small-text" style="border-left: none;">
+                            <li>📖 Ackoff (2002)</li>
+                            <li>📖 Hadley (1988)</li>
+                            <li>📖 Hillier (2002)</li>
+                            <li>📖 Moskowitz (1985)</li>
+                            <li>📖 Prawda (1991)</li>
+                        </ul>
+                        <ul class="flex-col custom-list small-text" style="border-left: none;">
+                            <li>📖 Simonnard (1978)</li>
+                            <li>📖 Taha (1998)</li>
+                            <li>📖 Bazaraa (1998)</li>
+                            <li>📖 Churchman (1992)</li>
+                            <li>📖 Winston (2005)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: CONTEO DE MEDALLAS (ESTADÍSTICAS) -->
+            <section>
+                <section data-background-image="fondos/bg_stats_batalla.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.3em;">Stats del Jugador (120 Pts)</h2>
+                        <div class="dialog-box" style="border-color: var(--poke-yellow);">
+                            <h4 style="color: var(--poke-red); font-family: 'Press Start 2P'; font-size: 0.7em;">⚔️ 60pts - Batallas de Gimnasios</h4>
+                            <p class="small-text">Cuatro Batallas: (G1 y 2), (G3), (G4), (G5). Debes tener mínimo 6 en cada batalla para no hacer reposición. Reposición sólo reprobando 1 batalla o final de 1ra vuelta.</p>
+                            <hr>
+                            <p class="small-text" style="color: var(--poke-blue);"><strong>Debes tener mínimo 6 en cada batalla para no hacer reposición en la primera vuelta o final</strong> </p>
+                        </div>
+                    </div>
+                </section>
+                
+                <section data-background-image="fondos/bg_stats_entrenamiento.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.3em;">Stats Adicionales</h2>
+                        <div class="dialog-box" style="border-color: #4CAF50;">
+                            <h4 style="color: #4CAF50; font-family: 'Press Start 2P'; font-size: 0.7em;">🏋️ 40pts - Entrenamientos</h4>
+                            <p class="small-text">Máximo 1 por semana en Classroom. Entrega los lunes (16 total).</p>
+                        </div>
+                        <div class="dialog-box" style="border-color: #E91E63; margin-top: 10px;">
+                            <h4 style="color: #E91E63; font-family: 'Press Start 2P'; font-size: 0.7em;">🍒 10+10pts - Bayas</h4>
+                            <p class="small-text">Ejercicios adicionales en Classroom. El entrenador con más bayas obtiene una medalla extra. Sube foto al formulario de cada gimnasio.</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- SECCIÓN VERTICAL: PLANTEAMIENTO DE RUTAS (GENERACIONES COMPLETAS) -->
+            <section>
+                <!-- Diapositiva 1: Vista general del Mapa Mental de Generaciones -->
+                <section data-background-image="fondos/bg_cielo_pokemon.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.5em;">Generaciones</h2>
+                        <p class="med-text" style="color: white; margin-top: 20px;">Tu mapa completo de mecánicas de entrenamiento y aprendizaje.</p>
+                        <div style="text-align: center; margin-top: 30px;">
+                            <img src="generaciones_mindmap.png" alt="Mapa Mental de Generaciones" style="max-width: 80%; border: 5px solid var(--poke-blue); border-radius: 15px; background: white;">
+                            <p class="small-text" style="color: white; margin-top: 10px;">Desliza hacia abajo para ver más detalles.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Diapositiva 2: Desglose Izquierdo -->
+                <section data-background-image="fondos/bg_generaciones_izq.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.2em;">Generaciones: Mecánicas</h2>
+                        <div class="flex-container med-text">
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-red); font-family: 'Press Start 2P'; font-size: 0.6em;">🤖 IAchú</h4>
+                                <p class="small-text">IA como apoyo. Misiones para explorar problemas y descubrir soluciones óptimas.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-red); font-family: 'Press Start 2P'; font-size: 0.6em;">⚔️ Batallas</h4>
+                                <p class="small-text">Enfrentamientos directos para probar tus conocimientos.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-red); font-family: 'Press Start 2P'; font-size: 0.6em;">📥 Auto bayas</h4>
+                                <p class="small-text">Bajar HTMLs, realizar actividad (90-100pts) y subir captura.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-red); font-family: 'Press Start 2P'; font-size: 0.6em;">🍒 Bayas</h4>
+                                <p class="small-text">Ejercicios adicionales y autoevaluaciones.</p>
+                            </div>
+                        </div>
+                        <div class="flex-container med-text" style="margin-top: 10px;">
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-red); font-family: 'Press Start 2P'; font-size: 0.6em;">🧐 Ejemplos</h4>
+                                <p class="small-text">Análisis de casos prácticos de Optimización.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-red); font-family: 'Press Start 2P'; font-size: 0.6em;">🏋️ Entrenamientos</h4>
+                                <p class="small-text">Tareas semanales en Classroom (16 en total).</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-red); font-family: 'Press Start 2P'; font-size: 0.6em;">🧩 Acertijos</h4>
+                                <p class="small-text">Actividades lúdicas (hashtag <code>#G_A_</code>).</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Diapositiva 3: Desglose Derecho -->
+                <section data-background-image="fondos/bg_generaciones_der.jpg" data-background-color="#222">
+                    <div class="overlay">
+                        <h2 class="poke-title" style="font-size: 1.2em;">Generaciones: Ítems</h2>
+                        <div class="flex-container med-text">
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-blue); font-family: 'Press Start 2P'; font-size: 0.6em;">🧭 Planteamiento</h4>
+                                <p class="small-text">Visión estratégica del curso y los caminos a seguir.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-blue); font-family: 'Press Start 2P'; font-size: 0.6em;">🗺️ Mapas</h4>
+                                <p class="small-text">Para cada gimnasio se establecerán las rutas del temario.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-blue); font-family: 'Press Start 2P'; font-size: 0.6em;">📊 Tabla SQA</h4>
+                                <p class="small-text">Visualiza tus conocimientos previos y logros (antes/después).</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-blue); font-family: 'Press Start 2P'; font-size: 0.6em;">💡 Bayas prototipo</h4>
+                                <p class="small-text">Análisis de problemas modelo para entender lo que aprenderás.</p>
+                            </div>
+                        </div>
+                        <div class="flex-container med-text" style="margin-top: 10px;">
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-blue); font-family: 'Press Start 2P'; font-size: 0.6em;">📱 Movimientos</h4>
+                                <p class="small-text">Realiza un TikTok sobre un tema asignado. Media medalla extra.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-blue); font-family: 'Press Start 2P'; font-size: 0.6em;">🗺️ Esquemas</h4>
+                                <p class="small-text">Mapas, tablas y diagramas para una mejor comprensión.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-blue); font-family: 'Press Start 2P'; font-size: 0.6em;">🗣️ Explicaciones</h4>
+                                <p class="small-text">Apoyo para comprender los temas y ejemplos.</p>
+                            </div>
+                            <div class="flex-col dialog-box" style="margin: 5px;">
+                                <h4 style="color: var(--poke-blue); font-family: 'Press Start 2P'; font-size: 0.6em;">🔴 Pokébola</h4>
+                                <p class="small-text">Contiene los resúmenes y ejercicios a trabajar.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Centro Pokémon (Casa, Facebook, QR de contacto) -->
+            <section data-background-image="fondos/bg_centro_pokemon.jpg" data-background-color="#222">
+    <div class="overlay" style="padding: 15px; max-width: 90%;">
+        <h2 class="poke-title" style="font-size: 1.1em; margin-bottom: 5px;">Centro Pokémon (Casa)</h2>
+        
+        <div class="dialog-box text-center" style="margin-top: 5px; margin-bottom: 15px; padding: 15px;">
+            <p class="small-text" style="margin-bottom: 5px;">Grupo en Facebook: Centro de comando para comunicación y acertijos.</p>
+            <p class="small-text" style="color: var(--poke-blue); margin-bottom: 0;">Ej. Acertijo: <code>#G2A27</code> | Ej. Baya: <code>#G2B2</code></p>
+        </div>
+        
+        <div class="flex-container" style="align-items: flex-start; gap: 30px;">
+            <div class="flex-col text-center">
+                <h4 style="color: white; font-family: 'Press Start 2P'; font-size: 0.5em; text-shadow: 2px 2px black; margin-bottom: 10px;">Equipo 1502</h4>
+                <img src="qr_1502.png" alt="QR 1502" class="qr-placeholder" style="max-width: 160px; height: auto; margin: 0 auto;">
+            </div>
+            <div class="flex-col text-center">
+                <h4 style="color: white; font-family: 'Press Start 2P'; font-size: 0.5em; text-shadow: 2px 2px black; margin-bottom: 10px;">Pokédex (Form)</h4>
+                <img src="qr_form.png" alt="QR Form" class="qr-placeholder" style="max-width: 160px; height: auto; margin: 0 auto;">
+            </div>
+        </div>
+    </div>
+</section>
+
+            <!-- Directorio de la Liga & Escala -->
+            <section data-background-image="fondos/bg_hall_fama.jpg" data-background-color="#222">
+                <div class="overlay">
+                    <h2 class="poke-title" style="font-size: 1.3em;">Hall de la Fama</h2>
+                    
+                    <div class="stats-box text-center" style="margin-bottom: 15px;">
+                        <p style="color: var(--poke-yellow);"><strong>Campeona de la Liga:</strong></p>
+                        <p class="small-text">152683@pcpuma.acatlan.unam.mx</p>
+                        <p style="color: var(--poke-yellow); margin-top:10px;"><strong>Líderes de Equipo:</strong></p>
+                        <p class="small-text">424103965@pcpuma.acatlan.unam.mx</p>
+                    </div>
+
+                    <div class="dialog-box text-center" style="max-width: 300px;">
+                        <p style="font-family: 'Press Start 2P'; font-size: 0.8em; color: var(--poke-red); text-align: center;">ESCALA EXP</p>
+                        <ul style="list-style-type: none; padding: 0; font-family: monospace; font-size: 1.2em;">
+                            <li>[ 0 , 6 ) = 5</li>
+                            <li>[ 6 , 6.5 ) = 6</li>
+                            <li>[ 6.5 , 7.5 ) = 7</li>
+                            <li>[ 7.5 , 8.5 ) = 8</li>
+                            <li>[ 8.5 , 9.5 ) = 9</li>
+                            <li>[ 9.5 , 10 ] = 10</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Pantalla Final -->
+            <section data-background-image="fondos/bg_pantalla_final.jpg" data-background-color="#000">
+                <div class="overlay">
+                    <h1 class="poke-title" style="font-size: 2em; animation: pulse 2s infinite;">¡Gotta catch 'em all!</h1>
+                </div>
+                <style>
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.05); }
+                        100% { transform: scale(1); }
+                    }
+                </style>
+            </section>
+
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true,
+            transition: 'slide',
+            backgroundTransition: 'zoom',
+            width: 1024,
+            height: 768,
+            margin: 0.1,
+            minScale: 0.2,
+            maxScale: 1.5,
+            mobileViewDistance: 3
+        });
+    </script>
+</body>
+</html>
